@@ -7,18 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Report extends Model
+class Major extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'type',
-        'generated_at',
+        'code',
+        'name',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'generated_at' => 'datetime',
-        ];
-    }
+
 }
