@@ -37,4 +37,9 @@ class StudyPlan extends Model
             'doctorate' => 'Доктор наук',
         ];
     }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'study_plan_courses');
+    }
 }

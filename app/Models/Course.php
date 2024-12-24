@@ -36,4 +36,23 @@ class Course extends Model
     {
         return $this->belongsTo(StudyPlan::class, 'plan_id');
     }
+
+    public static function courseTypes(): array
+    {
+        return [
+            'mandatory' => 'Обов\'язковий',
+            'optional' => 'Виборчий',
+        ];
+    }
+
+    public function studyPlans()
+    {
+        return $this->belongsToMany(StudyPlan::class, 'study_plan_courses');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_courses');
+    }
+
 }

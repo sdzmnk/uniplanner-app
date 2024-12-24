@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\StudyPlan;
 use App\Models\Major;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StudyPlanUpdateRequest;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudyPlanExport;
 
 
 class StudyPlanController extends Controller
@@ -26,9 +29,10 @@ class StudyPlanController extends Controller
      */
     public function create()
     {
+        $courses = Course::orderBy('name', 'asc')->get();
         $degreeLevels = StudyPlan::degreeLevels();
         $majors = Major::orderBy('code', 'asc')->get();
-        return view('admin.study_plan.create', compact('majors'), compact('degreeLevels'));
+        return view('admin.study_plan.create', compact('majors'), compact('degreeLevels', 'courses'));
     }
 
     /**
@@ -36,11 +40,29 @@ class StudyPlanController extends Controller
      */
     public function store(StudyPlanUpdateRequest $request)
     {
-        $data = $request->validated();
-        $data['user_id'] = auth()->id();
-        StudyPlan::create($data);
 
-        return redirect()->back()->withSuccess('Навчальни план успішно додано!');
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'major_id' => 'required|exists:majors,id',
+            'degree_level' => 'required|string',
+            'year' => 'required|integer|min:2024|max:2026',
+            'course_ids' => 'required|array',
+            'course_ids.*' => 'exists:courses,id',
+        ]);
+
+        // Создаём учебный план
+        $studyPlan = StudyPlan::create([
+            'name' => $request->name,
+            'user_id' => auth()->id(),
+            'major_id' => $request->major_id,
+            'degree_level' => $request->degree_level,
+            'year' => $request->year,
+        ]);
+
+        // Связываем курсы с учебным планом
+        $studyPlan->courses()->attach($request->course_ids);
+
+        return redirect()->route('study_plan.index')->with('success', 'Навчальний план створено успішно!');
     }
 
     /**
@@ -48,7 +70,9 @@ class StudyPlanController extends Controller
      */
     public function show(StudyPlan $studyPlan)
     {
-        //
+        $studyPlan->load('courses', 'major');
+
+        return view('admin.study_plan.show', compact('studyPlan'));
     }
 
     /**
@@ -58,18 +82,39 @@ class StudyPlanController extends Controller
     {
         $degreeLevels = StudyPlan::degreeLevels();
         $majors = Major::orderBy('code', 'asc')->get();
-        return view('admin.study_plan.edit', compact('studyPlan', 'majors', 'degreeLevels'));
+        $courses = Course::orderBy('name', 'asc')->get();
+        $selectedCourses = $studyPlan->courses->pluck('id')->toArray();
+
+        return view('admin.study_plan.edit', compact('studyPlan', 'majors', 'degreeLevels', 'courses', 'selectedCourses'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StudyPlanUpdateRequest $request, StudyPlan $studyPlan)
+    public function update(Request $request, StudyPlan $studyPlan)
     {
-        $studyPlan['user_id'] = auth()->id();
-        $studyPlan->update($request->validated());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'major_id' => 'required|exists:majors,id',
+            'degree_level' => 'required|string',
+            'year' => 'required|integer|min:2024|max:2026',
+            'course_ids' => 'required|array',
+            'course_ids.*' => 'exists:courses,id',
+        ]);
 
-        return redirect()->route('study_plan.index')->withSuccess('Навчальний план успішно оновлено!');
+        // Обновление данных учебного плана
+        $studyPlan->update([
+            'name' => $request->name,
+            'major_id' => $request->major_id,
+            'degree_level' => $request->degree_level,
+            'year' => $request->year,
+        ]);
+
+        // Синхронизация курсов с учебным планом
+        $studyPlan->courses()->sync($request->course_ids);
+
+        return redirect()->route('study_plan.index')->with('success', 'Навчальний план успішно оновлено!');
     }
 
 
@@ -80,5 +125,10 @@ class StudyPlanController extends Controller
     {
         $studyPlan->delete();
         return redirect()->back()->withSuccess('Навчальний план було успішно видалено!');
+    }
+
+    public function export($id)
+    {
+        return Excel::download(new StudyPlanExport($id), 'study_plan_' . $id . '.xlsx');
     }
 }

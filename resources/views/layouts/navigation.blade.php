@@ -13,7 +13,16 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Головна') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.index')" :active="request()->routeIs('dashboard')">
+                        {{ __('Адміністратору') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('teacher.index')" :active="request()->routeIs('dashboard')">
+                        {{ __('Викладачу') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('student.index')" :active="request()->routeIs('dashboard')">
+                        {{ __('Студенту') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -35,7 +44,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Профіль') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -45,7 +54,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Вийти') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -68,7 +77,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Головна') }}
             </x-responsive-nav-link>
         </div>
 
@@ -81,7 +90,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Профіль') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -91,7 +100,7 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Вийти') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

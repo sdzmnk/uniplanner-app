@@ -70,6 +70,17 @@
                         </div><!--/.select -->
 
                         <div class="form-group">
+                            <label>Оберіть предмети для навчального плану:</label>
+                            <select name="course_ids[]" class="select2bs4" multiple="multiple" data-placeholder="Оберіть предмети" style="width: 100%;">
+                                @foreach ($courses as $course)
+                                    <option value="{{ $course['id'] }}" @if (in_array($course['id'], $selectedCourses)) selected @endif>
+                                        {{ $course['name'] }} - {{ \App\Models\Course::courseTypes()[$course['type']] ?? $course['type'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="exampleInputEmail1">Рік</label>
                             <input type="number" value="{{ $studyPlan->year}}" name="year" class="form-control" min="2024" max="2026" step="1" id="exampleInputEmail1" placeholder="Рік">
                         </div>
@@ -80,6 +91,7 @@
 
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Відредагувати</button>
+                        <a href="{{ route('study_plan.index') }}" class="btn btn-secondary">Назад</a>
                     </div>
                 </form>
             </div>

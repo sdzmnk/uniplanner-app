@@ -4,15 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\StudyPlan;
+use App\Models\Course;
+use App\Models\User;
 
 class HomeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+        public function index()
     {
-        return view('admin.home.index');
+        $userCount = User::count();
+        $studyPlanCount = StudyPlan::count();
+        $disciplineCount = Course::count();
+        return view('admin.home.index', compact('userCount', 'studyPlanCount', 'disciplineCount'));
     }
 
     /**

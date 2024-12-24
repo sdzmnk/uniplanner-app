@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Створити навчальний план')
+@section('title', 'Створити курс')
 
 @section('content')
     <!-- Content Header (Page header) -->
@@ -8,7 +8,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Створити навчальний план</h1>
+                    <h1 class="m-0">Створити курс</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
             @if (session('success'))
@@ -35,44 +35,46 @@
             <div class="col-lg-12">
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form action="{{route('study_plan.store')}}" method="POST">
+                <form action="{{ route('course.store') }}" method="POST">
                     @csrf
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Назва плану</label>
-                            <input type="text" name="name" class="form-control" id="exampleInputEmail1" placeholder="Назва плану">
+                            <label for="courseName">Назва курсу</label>
+                            <input type="text" name="name" class="form-control" id="courseName" placeholder="Назва курсу">
                         </div>
 
                         <div class="form-group">
-                            <label>Оберіть спеціальність</label>
-                            <select name="major_id" class="form-control select2bs4" style="width: 100%;">
-                                @foreach ($majors as $major)
-                                    <option value="{{ $major['id'] }}"> {{ $major['code'] }} - {{ $major['name'] }}</option>
-                                @endforeach
-                            </select>
+                            <label for="courseCredits">Кредити</label>
+                            <input type="number" name="credits" class="form-control" id="courseCredits" placeholder="Кредити">
                         </div>
 
-                        <!-- select -->
                         <div class="form-group">
-                            <label>Рівень ступеню освіти</label>
-                            <select name="degree_level" class="form-control">
-                                @foreach ($degreeLevels as $key => $label)
+                            <label for="courseType">Тип курсу</label>
+                            <select name="type" class="form-control" id="courseType">
+                                @foreach (\App\Models\Course::courseTypes() as $key => $label)
                                     <option value="{{ $key }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-                        </div><!--/.select -->
-
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">Рік</label>
-                            <input type="number" name="year" class="form-control" min="2024" max="2026" step="1" id="exampleInputEmail1" placeholder="Рік">
                         </div>
 
                         <div class="form-group">
-                            <label>Оберіть предмети для навчального плану: </label>
-                            <select name="course_ids[]" class="select2bs4" multiple="multiple" data-placeholder="Оберіть предмети"
+                            <label for="courseHours">Кількість годин</label>
+                            <input type="number" name="hours" class="form-control" id="courseHours" placeholder="Кількість годин">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseSemester">Семестр</label>
+                            <input type="number" name="semester" class="form-control" id="courseSemester" placeholder="Семестр" min="1" max="12">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Оберіть викладачів для курсу: </label>
+                            <select name="user_ids[]" class="select2bs4" multiple="multiple" data-placeholder="Оберіть викладачів"
                                     style="width: 100%;">
-                                @foreach ($courses as $course)
-                                    <option value ="{{ $course['id'] }}"> {{ $course['name'] }} - {{ \App\Models\Course::courseTypes()[$course['type']] ?? $course['type']  }}</option>
+                                @foreach ($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}">
+                                        {{ $teacher->name }} ({{ $teacher->email }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -81,8 +83,8 @@
                     <!-- /.card-body -->
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Створити</button>
-                        <a href="{{ route('study_plan.index') }}" class="btn btn-secondary">Назад</a>
+                        <button type="submit" class="btn btn-primary">Створити курс</button>
+                        <a href="{{ route('course.index') }}" class="btn btn-secondary">Назад</a>
                     </div>
 
                 </form>
@@ -90,4 +92,3 @@
         </div><!-- /.container-fluid -->
     </section>
 @endsection
-
